@@ -1,0 +1,196 @@
+buildscript {
+    dependencies {
+        classpath "com.newrelic.commune.gradle:gradle-dependency-upgrade-plugin:${project['gradle-dependency-upgrade-plugin.version']}"
+        classpath "ca.cutterslade.gradle:gradle-dependency-analyze:${project['gradle-dependency-analyze.version']}"
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.kapt"
+
+    id "us.datanerd.application"
+    id "us.datanerd.docker"
+    id "us.datanerd.idea"
+    id "us.datanerd.java-service"
+    id "us.datanerd.coverage"
+    id "us.datanerd.buildinfo"
+    id "us.datanerd.dependency-license-manifest"
+    id "us.datanerd.dependency-upgrade" version "$newrelicDependencyUpgradeVersion"
+
+    id "ca.cutterslade.analyze" version "$analyzeVersion"
+    id "com.diffplug.spotless" version "$spotlessVersion"
+}
+
+allprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = project['jdk.version']
+        }
+    }
+}
+
+application {
+    name '__REPO__'
+    mainClass 'com.newrelic.__PACKAGE__.__CLASS__Application'
+    port 8080 // Should correspond with src/dist/config/server.yml
+    usingSimpleControlScripts true
+}
+
+docker {
+    name '@DOCKER_TAG@'
+    // app_port, jmx_port, admin_port
+    ports application.port, application.port + 1, application.port + 2
+    build {
+        from 'cf-registry.nr-ops.net/newrelic/ubuntu-2204-java:17'
+        maintainer '@ORG@ <@EMAIL@>'
+        label 'application', application.name
+    }
+    run {
+        envVars << [MARATHON_APP_RESOURCE_CPUS: '1']
+        envVars << [JAVA_ARGS: 'server /data/__REPO__/config/server.yml']
+    }
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+}
+
+agent.version project['agent.version']
+
+configurations.all {
+    // why we do this: https://source.datanerd.us/gist/tom/77ed8974f0ac0b93b592
+    exclude module: 'slf4j-log4j12'
+    exclude group: 'log4j'
+    exclude module: 'commons-logging'
+    exclude group: 'junit'
+    exclude module: 'validation-api'
+
+    resolutionStrategy {
+        force "org.apache.httpcomponents:httpclient:${project['httpclient.version']}"
+        force "org.jetbrains.kotlin:kotlin-reflect:${project['kotlin.version']}" // jackson
+        force "org.jacoco:org.jacoco.agent:${project['jacoco.version']}"
+        force "org.jacoco:org.jacoco.ant:${project['jacoco.version']}"
+    }
+}
+
+dependencies {
+    kapt "com.google.dagger:dagger-compiler:${project['dagger2.version']}"
+
+    //
+    // implementation: on your classpath at compile time, runtime and in tests
+    //
+    implementation "com.fasterxml.jackson.core:jackson-annotations:${project['jackson.version']}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${project['jackson.version']}"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:${project['jackson.version']}"
+    implementation "com.google.dagger:dagger:${project['dagger2.version']}"
+    implementation "com.google.guava:guava:${project['guava.version']}"
+    implementation "com.newrelic:autoservices:${project['autoservices.version']}"
+    implementation "com.newrelic:idiomancer-core:${project['idiomancer.version']}"
+    implementation "com.newrelic:idiomancer-dagger2:${project['idiomancer.version']}"
+    implementation "com.newrelic:monitoring-event-emitter:${project['monitoring-event-emitter.version']}"
+    implementation "com.squareup.okhttp3:okhttp:${project['okhttp.version']}"
+    implementation "io.dropwizard.metrics:metrics-healthchecks:${project['dropwizard.metrics.version']}"
+    implementation "io.dropwizard:dropwizard-configuration:${project['dropwizard.version']}"
+    implementation "io.dropwizard:dropwizard-core:${project['dropwizard.version']}"
+    implementation "io.dropwizard:dropwizard-lifecycle:${project['dropwizard.version']}"
+    implementation "javax.inject:javax.inject:1"
+    implementation "org.apache.commons:commons-text:${project['commons-text.version']}"
+    implementation "org.eclipse.jetty:jetty-util:${project['jetty.version']}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${project['kotlin.version']}"
+    implementation "org.jetbrains:annotations:${project['jetbrains.version']}"
+    implementation "com.newrelic.logging:dropwizard:${project['nr-dropwizard-logging.version']}"
+    //
+    // runtimeOnly: on your classpath at runtime and in tests
+    //
+    runtimeOnly "ch.qos.logback:logback-classic:${project['logback.version']}"
+    runtimeOnly "ch.qos.logback:logback-core:${project['logback.version']}"
+    runtimeOnly "org.slf4j:jcl-over-slf4j:${project['slf4j.version']}"
+    runtimeOnly "org.slf4j:log4j-over-slf4j:${project['slf4j.version']}"
+
+    kaptTest "com.google.dagger:dagger-compiler:${project['dagger2.version']}"
+
+    //
+    // testImplementation: on your classpath during tests
+    //
+    testImplementation "com.newrelic:idiomancer-test:${project['idiomancer.version']}"
+    testImplementation "io.dropwizard:dropwizard-client:${project['dropwizard.version']}"
+    testImplementation "io.dropwizard:dropwizard-testing:${project['dropwizard.version']}"
+    testImplementation "io.mockk:mockk:${project['mockk.version']}"
+    testImplementation "jakarta.ws.rs:jakarta.ws.rs-api:${project['jakarta.ws.rs.version']}"
+    testImplementation "org.assertj:assertj-core:${project['assertj.version']}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${project['junit.version']}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${project['junit.version']}"
+    testImplementation "org.slf4j:slf4j-api:${project['slf4j.version']}"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+idea.runConfigurations {
+    service {
+        serviceDefaults()
+        args 'server', 'src/dist/config/server.yml'
+    }
+    junit()
+}
+
+sourceSets.main.java.srcDir file("$buildDir/generated/source/kapt/main/")
+sourceSets.test.java.srcDir file("$buildDir/generated/source/kapt/test/")
+
+idea.project.ipr {
+    // Apply idea Kotlin customization after the New Relic IDEA plugin finishes generating the xml.
+    whenMerged { prj ->
+        def node = prj.xml.component.find { it.@name == 'Kotlin2JvmCompilerArguments' }
+        if (node == null) {
+            node = prj.xml.appendNode('component', [name: 'Kotlin2JvmCompilerArguments'])
+        }
+
+        def jvmTargetNode = node.option.find { it.@name == 'jvmTarget' }
+        if (jvmTargetNode == null) {
+            jvmTargetNode = node.appendNode('option')
+        }
+        jvmTargetNode.replaceNode {
+            option(name: 'jvmTarget', value: project['jdk.version'])
+        }
+    }
+}
+
+idea.module {
+    sourceDirs += file('src/main/kotlin')
+    sourceDirs += file("$buildDir/generated/source/kapt/main/")
+}
+
+analyzeClassesDependencies {
+    warnUsedUndeclared = true
+    warnUnusedDeclared = true
+}
+
+analyzeTestClassesDependencies {
+    warnUsedUndeclared = true
+    warnUnusedDeclared = true
+}
+
+coverage {
+    generatedSources = ['**/Dagger*','**/*_*Factory*']
+    fileThreshold 0.0
+}
+
+compileKotlin.dependsOn generateSources
+
+// So IJ doesn't warn about unused fields/methods in JSON config & model classes
+idea.entryPoints << 'com.fasterxml.jackson.annotation.JsonProperty'
+idea.entryPoints << 'com.fasterxml.jackson.annotation.JsonCreator'
+
+spotless {
+    kotlin {
+        ktlint()
+            .editorConfigOverride([
+                "ktlint_standard_filename": "disabled", // Removed during nos setup
+                "ktlint_standard_class-naming": "disabled", // Removed during nos setup
+                "ij_kotlin_allow_trailing_comma" : false,
+                "ij_kotlin_allow_trailing_comma_on_call_site" : false
+            ])
+    }
+}

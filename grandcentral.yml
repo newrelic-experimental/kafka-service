@@ -1,0 +1,8 @@
+deploy_mechanism: none
+require_sidekick_approval: false
+
+test_suites:
+- name: Unit Tests
+  command: ./gradlew --refresh-dependencies clean build check
+  environment:
+    docker_image: cf-registry.nr-ops.net/newrelic/base-gcbuild-java:17

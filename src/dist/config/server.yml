@@ -1,0 +1,47 @@
+# By default, Dropwizard spins up _way_ too many Jetty threads based on the
+# total number of cores on our shared docker hosts.  If you serve HTTP requests
+# which spend a lot of time blocked on I/O, you might want to increase maxThreads,
+# but it's very unlikely you will need to increase any of the others.
+server:
+  minThreads: 1
+  maxThreads: 8
+  adminMinThreads: 1
+  adminMaxThreads: 4
+  applicationConnectors:
+  - type: http
+    port: 8080
+    acceptorThreads: 1
+    selectorThreads: 1
+    maxRequestHeaderSize: 128KiB
+    # JMX listens on app_port+1
+  adminConnectors:
+  - type: http
+    port: 8082
+    acceptorThreads: 1
+    selectorThreads: 1
+
+logging:
+  level: ${LOG_LEVEL:-INFO}
+  appenders:
+  - type: newrelic-console
+    layout:
+      type: newrelic-json
+
+__CAMEL__Config: ${EXAMPLE_CONFIG:-puppies}
+
+# Make sure to set WRITE_ONLY access on secrets that should not be exposed via the /status/config endpoint
+exampleSecret: ${EXAMPLE_SECRET}
+
+monitoringAccountId: ${MONITORING_ACCOUNT_ID:-1}
+
+jvmMonitorConfig:
+  isEnabled: ${JVM_MONITOR_ENABLED:-true}
+  eventSendPeriodMillis: 5000
+  eventType: NodeStatus
+
+batchingEventProducerServiceConfig:
+  isEnabled: ${MONITORING_EVENTS_ENABLED:-true}
+  eventBatchSizeThreshold: 100
+  maximumStalenessMillis: 5000
+  insightsApiUri: ${INSIGHTS_API_URI}/v1/accounts/${MONITORING_ACCOUNT_ID}/events
+  insightsApiKey: ${INSIGHTS_API_KEY}

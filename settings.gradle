@@ -1,0 +1,15 @@
+pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.toString().startsWith("us.datanerd") && requested.version == null) {
+                useVersion newrelicGradleVersion
+            }
+
+            if (requested.id.toString().startsWith("org.jetbrains.kotlin.") && requested.version == null) {
+                useVersion settings["kotlin.version"]
+            }
+        }
+    }
+}
+
+rootProject.name = '__REPO__'

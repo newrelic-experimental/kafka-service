@@ -1,0 +1,38 @@
+common: &default_settings
+  host: staging-collector.newrelic.com
+  enabled: true
+  enable_custom_tracing: true
+  attributes.include: request.parameters.*
+
+  thread_profiler:
+    enabled: true
+
+  # turn this off -- it burns a ton of CPU on short-lived transactions
+  thread_cpu_time_enabled: false
+
+  circuitbreaker:
+    enabled: false
+
+  error_collector:
+    enabled: true
+    capture_source: true
+    ignore_status_codes: [ 503, 413, 415, 404, 400 ]
+
+  application_logging:
+    enabled: true
+    local_decorating:
+      enabled: true
+    forwarding:
+      enabled: false
+
+production:
+  <<: *default_settings
+  app_name: 'Production __REPO__'
+
+staging:
+  <<: *default_settings
+  app_name: 'Staging __REPO__'
+
+development:
+  <<: *default_settings
+  app_name: 'Local __REPO__'
