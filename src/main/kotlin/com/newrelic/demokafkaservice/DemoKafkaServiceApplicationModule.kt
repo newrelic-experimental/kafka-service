@@ -1,6 +1,4 @@
-@file:Suppress("ktlint")
-
-package com.newrelic.__PACKAGE__
+package com.newrelic.demokafkaservice
 
 import com.google.common.collect.ImmutableMap
 import com.newrelic.autoservices.AutoService
@@ -18,7 +16,7 @@ import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 @Module(includes = [IdiomancerModule::class, GrandCentralModule::class])
-class __CLASS__ApplicationModule {
+class DemoKafkaServiceApplicationModule {
     @Provides
     @Singleton
     fun autoServiceMembersNotDirectlyRequiredByOtherPartsOfTheObjectGraph(jvmMonitorService: JvmMonitorService): Set<AutoService> {
@@ -27,18 +25,18 @@ class __CLASS__ApplicationModule {
 
     @Provides
     @Singleton
-    fun get__CLASS__Configuration(__CAMEL__Configuration: __CLASS__Configuration): Configuration {
-        return __CAMEL__Configuration
+    fun getDemoKafkaServiceConfiguration(demoKafkaServiceConfiguration: DemoKafkaServiceConfiguration): Configuration {
+        return demoKafkaServiceConfiguration
     }
 
     @Provides
     @Singleton
     fun getSingleEventProducer(
-        __CAMEL__Configuration: __CLASS__Configuration,
+        demoKafkaServiceConfiguration: DemoKafkaServiceConfiguration,
         autoServices: AutoServices
     ): SingleEventProducer {
-        val batchingEventProducerConfig = __CAMEL__Configuration.batchingEventProducerServiceConfig
-        val accountId = __CAMEL__Configuration.monitoringAccountId
+        val batchingEventProducerConfig = demoKafkaServiceConfiguration.batchingEventProducerServiceConfig
+        val accountId = demoKafkaServiceConfiguration.monitoringAccountId
         val okHttpClient = OkHttpClient()
         val sendStrategy = AbstractSendStrategy.builder()
             .withInsightsApi(okHttpClient, batchingEventProducerConfig.insightsApiUri, batchingEventProducerConfig.insightsApiKey)
@@ -50,11 +48,11 @@ class __CLASS__ApplicationModule {
     @Provides
     @Singleton
     fun getJvmMonitorService(
-        __CAMEL__Configuration: __CLASS__Configuration,
+        demoKafkaServiceConfiguration: DemoKafkaServiceConfiguration,
         singleEventProducer: SingleEventProducer,
         autoServices: AutoServices
     ): JvmMonitorService {
-        val jvmMonitorConfig = __CAMEL__Configuration.jvmMonitorConfig
+        val jvmMonitorConfig = demoKafkaServiceConfiguration.jvmMonitorConfig
         return JvmMonitorService(autoServices, jvmMonitorConfig, singleEventProducer)
     }
 }

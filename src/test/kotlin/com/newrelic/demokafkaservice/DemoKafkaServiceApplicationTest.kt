@@ -1,6 +1,4 @@
-@file:Suppress("ktlint")
-
-package com.newrelic.__PACKAGE__
+package com.newrelic.demokafkaservice
 
 import io.dropwizard.client.JerseyClientBuilder
 import io.dropwizard.testing.ConfigOverride
@@ -21,13 +19,13 @@ const val EXAMPLE_CONFIG = "exposedValue"
 const val clientReadTimeoutMilliseconds = 30000 // things can be slow when running tests locally in Docker for Mac
 
 @ExtendWith(DropwizardExtensionsSupport::class)
-class __CLASS__ApplicationTest {
+class DemoKafkaServiceApplicationTest {
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(__CLASS__ApplicationTest::class.java)
-        private val appRule = DropwizardAppExtension<__CLASS__Configuration>(
-            __CLASS__Application::class.java,
+        private val LOGGER = LoggerFactory.getLogger(DemoKafkaServiceApplicationTest::class.java)
+        private val appRule = DropwizardAppExtension<DemoKafkaServiceConfiguration>(
+            DemoKafkaServiceApplication::class.java,
             ResourceHelpers.resourceFilePath("server.yml"),
-            ConfigOverride.config("__CAMEL__Config", EXAMPLE_CONFIG),
+            ConfigOverride.config("demoKafkaServiceConfig", EXAMPLE_CONFIG),
             ConfigOverride.config("exampleSecret", EXAMPLE_SECRET)
         )
     }
@@ -48,7 +46,7 @@ class __CLASS__ApplicationTest {
 
     @Test
     fun main_ChecksConfiguration_NoExceptionThrown() {
-        __CLASS__Application.main(arrayOf("check", ResourceHelpers.resourceFilePath("server.yml")))
+        DemoKafkaServiceApplication.main(arrayOf("check", ResourceHelpers.resourceFilePath("server.yml")))
     }
 
     @Test

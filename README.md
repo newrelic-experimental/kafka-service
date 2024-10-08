@@ -1,6 +1,6 @@
-# __REPO__
+# demo-kafka-service
 
-(Replace this section with a description of the __REPO__ project.)
+(Replace this section with a description of the demo-kafka-service project.)
 
 ## Using this Template
 
@@ -9,13 +9,13 @@ for more information on how to get started with NOS.
 
 ### Template Environment Variables
 
-This template has the following environment variables that you can set in the NOS configuration file (__REPO___nos.conf) before you publish.
+This template has the following environment variables that you can set in the NOS configuration file (demo-kafka-service_nos.conf) before you publish.
 
 * MONITORING_ACCOUNT_ID - This controls the account ID where NodeStatus events are sent, by default it is set to account 1.
 
 NOTE: If you change the MONITORING_ACCOUNT_ID you need to do the following:
 
-1. Get an Insights API key for the account you changed to, you can do that [here](https://staging-insights.newrelic.com/accounts/@MONITORING_ACCOUNT_ID@/manage/api_keys).
+1. Get an Insights API key for the account you changed to, you can do that [here](https://staging-insights.newrelic.com/accounts/12362140/manage/api_keys).
 2. Write that Insights API key as a secret in vault. [Read here for directions on the vault path to use](https://pages.datanerd.us/site-engineering/nr-platform-docs/grand_central/configuration.html#environmentsecret_env_vars)
 3. Update the secret_env_vars entry for the INSIGHTS_API_KEY in your grandcentral.yml to point to the new path.
 

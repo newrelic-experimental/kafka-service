@@ -27,7 +27,7 @@ logging:
     layout:
       type: newrelic-json
 
-__CAMEL__Config: ${EXAMPLE_CONFIG:-puppies}
+demoKafkaServiceConfig: ${EXAMPLE_CONFIG:-puppies}
 
 # Make sure to set WRITE_ONLY access on secrets that should not be exposed via the /status/config endpoint
 exampleSecret: ${EXAMPLE_SECRET}

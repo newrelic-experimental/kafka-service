@@ -27,12 +27,12 @@ common: &default_settings
 
 production:
   <<: *default_settings
-  app_name: 'Production __REPO__'
+  app_name: 'Production demo-kafka-service'
 
 staging:
   <<: *default_settings
-  app_name: 'Staging __REPO__'
+  app_name: 'Staging demo-kafka-service'
 
 development:
   <<: *default_settings
-  app_name: 'Local __REPO__'
+  app_name: 'Local demo-kafka-service'

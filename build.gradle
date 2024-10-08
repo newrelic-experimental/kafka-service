@@ -31,24 +31,24 @@ allprojects {
 }
 
 application {
-    name '__REPO__'
-    mainClass 'com.newrelic.__PACKAGE__.__CLASS__Application'
+    name 'demo-kafka-service'
+    mainClass 'com.newrelic.demokafkaservice.DemoKafkaServiceApplication'
     port 8080 // Should correspond with src/dist/config/server.yml
     usingSimpleControlScripts true
 }
 
 docker {
-    name '@DOCKER_TAG@'
+    name 'cf-registry.nr-ops.net/alerting/demo-kafka-service'
     // app_port, jmx_port, admin_port
     ports application.port, application.port + 1, application.port + 2
     build {
         from 'cf-registry.nr-ops.net/newrelic/ubuntu-2204-java:17'
-        maintainer '@ORG@ <@EMAIL@>'
+        maintainer 'alerting <nos@newrelic.com>'
         label 'application', application.name
     }
     run {
         envVars << [MARATHON_APP_RESOURCE_CPUS: '1']
-        envVars << [JAVA_ARGS: 'server /data/__REPO__/config/server.yml']
+        envVars << [JAVA_ARGS: 'server /data/demo-kafka-service/config/server.yml']
     }
 }
 
@@ -187,8 +187,6 @@ spotless {
     kotlin {
         ktlint()
             .editorConfigOverride([
-                "ktlint_standard_filename": "disabled", // Removed during nos setup
-                "ktlint_standard_class-naming": "disabled", // Removed during nos setup
                 "ij_kotlin_allow_trailing_comma" : false,
                 "ij_kotlin_allow_trailing_comma_on_call_site" : false
             ])

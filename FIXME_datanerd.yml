@@ -1,7 +1,7 @@
 services:
-  __HUMAN__:
+  Demo Kafka Service:
     team: ???
-    service_name: __REPO__
+    service_name: demo-kafka-service
     description: Put your description here.
     tier: ???
     risk_matrix: Link to your risk matrix here
@@ -9,13 +9,13 @@ services:
     architecture_risk: ???
 
     links:
-      - https://source.datanerd.us/@ORG@/__REPO__
-      - https://source.datanerd.us/@ORG@/__REPO__/blob/master/README.md
+      - https://source.datanerd.us/alerting/demo-kafka-service
+      - https://source.datanerd.us/alerting/demo-kafka-service/blob/master/README.md
 
     dependencies:
       - Kafka
 
-    slack: '#@SLACK_CHANNEL@'
+    slack: '#dvm-bots'
 
     environments:
       - staging
