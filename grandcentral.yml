@@ -1,8 +1,69 @@
-deploy_mechanism: none
-require_sidekick_approval: false
+team_name: 'alerts'
+slack_channel: dvm-bots
+deploy_mechanism: general-purpose
+docker_image: cf-registry.nr-ops.net/alerting/demo-kafka-service
+container_ports:
+- 8080
+- 8081
+- 8082
+base_environment:
+  new_relic:
+    account_id: 12362140
+    api_key_vault_path: containers/teams/alerts/staging/demo-kafka-service/NEW_RELIC_API_KEY
+  allow_instances_to_be_destroyed: true
+  env_vars:
+    INSIGHTS_API_URI: discovery_path:monitoring-insights-collector
+    JAVA_ARGS: server /data/demo-kafka-service/config/server.yml
+    JAVA_GC_OPTS: -Xmx1g
+    MONITORING_ACCOUNT_ID: "12362140"
+    NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED: true
+  secret_env_vars:
+  - name: INSIGHTS_API_KEY
+  - name: NEW_RELIC_API_KEY
+  canaries:
+  - previous_environment_auto_deploy:
+      enabled: false
+  auto_deploy_from_canary:
+    enabled: true
+environments:
+- name: staging
+  vault_environment: staging
+  instances: 1
+  memory_mb: 4096
+  cpus: 1
+  canaries: []
 
+- name: production
+  memory_mb: 2048
+  canaries: []
+
+- name: eu-production
+  memory_mb: 2048
+  canaries: []
+
+apm_verification:
+  rollback_on_failure: false
+disable_default_environments: true
+identity:
+  owning_team: Detection Violation Management
 test_suites:
-- name: Unit Tests
-  command: ./gradlew --refresh-dependencies clean build check
+- command: ./gradlew check
   environment:
     docker_image: cf-registry.nr-ops.net/newrelic/base-gcbuild-java:17
+  name: Unit Tests
+  reports:
+    find_bugs:
+      pattern: build/findbugsReports/*.xml
+    jacoco:
+      exclusion_pattern: '**/thrift/**,**/*InjectAdapter*,**/*ModuleAdapter*,**/*ProvidesAdapter*,**/Dagger*,**/*_*Factory*'
+      max_coverage: 0
+      min_coverage: 0
+    junit:
+      pattern: '**/build/test-results/**/*.xml'
+docker_build:
+  command: ./gradlew dockerBuild
+  publish_pull_requests: true
+  build_pull_requests: true
+  environment:
+    docker_image: cf-registry.nr-ops.net/newrelic/base-gcbuild-java:17
+  image_name: cf-registry.nr-ops.net/alerting/demo-kafka-service

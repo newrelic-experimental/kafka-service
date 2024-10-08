@@ -1,15 +1,13 @@
-@file:Suppress("ktlint")
-
-package com.newrelic.__PACKAGE__.status
+package com.newrelic.demokafkaservice.status
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class __CLASS__HealthCheckTest {
+class DemoKafkaServiceHealthCheckTest {
 
     @Test
     fun healthCheckIsHealthy() {
-        val healthCheck = __CLASS__HealthCheck()
+        val healthCheck = DemoKafkaServiceHealthCheck()
         val result = healthCheck.execute()
         assertThat(result.isHealthy).isTrue()
     }
