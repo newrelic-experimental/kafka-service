@@ -1,8 +1,59 @@
-deploy_mechanism: none
-require_sidekick_approval: false
-
+slack_channel: dvm-bots
+deploy_mechanism: general-purpose
+docker_image: cf-registry.nr-ops.net/alerting/demo-kafka-service
+container_ports:
+- 8080
+- 8081
+- 8082
+base_environment:
+  allow_instances_to_be_destroyed: true
+  env_vars:
+    EXAMPLE_CONFIG: puppies
+    INSIGHTS_API_URI: discovery_path:monitoring-insights-collector
+    JAVA_ARGS: server /data/demo-kafka-service/config/server.yml
+    JAVA_GC_OPTS: -Xmx1g
+    MONITORING_ACCOUNT_ID: "12362140"
+  secret_env_vars:
+  - name: INSIGHTS_API_KEY
+    shared_path: nr-admin-monitoring
+  canaries:
+  - previous_environment_auto_deploy:
+      enabled: true
+  auto_deploy_from_canary:
+    enabled: true
+environments:
+- name: staging
+  instances: 1
+  memory_mb: 2048
+  canaries:
+  - auto_deploy_on_master_merge: true
+- name: production
+  memory_mb: 2048
+  canaries: []
+- name: eu-production
+  memory_mb: 2048
+  canaries: []
+apm_verification:
+  rollback_on_failure: true
+disable_default_environments: true
+identity:
+  owning_team: Detection Violation Management
 test_suites:
-- name: Unit Tests
-  command: ./gradlew --refresh-dependencies clean build check
+- command: ./gradlew check
   environment:
     docker_image: cf-registry.nr-ops.net/newrelic/base-gcbuild-java:17
+  name: Unit Tests
+  reports:
+    find_bugs:
+      pattern: build/findbugsReports/*.xml
+    jacoco:
+      exclusion_pattern: '**/thrift/**,**/*InjectAdapter*,**/*ModuleAdapter*,**/*ProvidesAdapter*,**/Dagger*,**/*_*Factory*'
+      max_coverage: 96
+      min_coverage: 96
+    junit:
+      pattern: '**/build/test-results/**/*.xml'
+docker_build:
+  command: ./gradlew dockerBuild
+  environment:
+    docker_image: cf-registry.nr-ops.net/newrelic/base-gcbuild-java:17
+  image_name: cf-registry.nr-ops.net/alerting/demo-kafka-service
