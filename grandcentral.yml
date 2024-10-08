@@ -1,3 +1,4 @@
+team_name: 'alerts'
 slack_channel: dvm-bots
 deploy_mechanism: general-purpose
 docker_image: cf-registry.nr-ops.net/alerting/demo-kafka-service
@@ -6,19 +7,20 @@ container_ports:
 - 8081
 - 8082
 base_environment:
+  new_relic:
+    account_id: 12362140
+    api_key_vault_path: containers/teams/alerts/staging/demo-kafka-service/INSIGHTS_API_KEY
   allow_instances_to_be_destroyed: true
   env_vars:
-    EXAMPLE_CONFIG: puppies
     INSIGHTS_API_URI: discovery_path:monitoring-insights-collector
     JAVA_ARGS: server /data/demo-kafka-service/config/server.yml
     JAVA_GC_OPTS: -Xmx1g
     MONITORING_ACCOUNT_ID: "12362140"
   secret_env_vars:
   - name: INSIGHTS_API_KEY
-    shared_path: nr-admin-monitoring
   canaries:
   - previous_environment_auto_deploy:
-      enabled: true
+      enabled: false
   auto_deploy_from_canary:
     enabled: true
 environments:
@@ -34,7 +36,7 @@ environments:
   memory_mb: 2048
   canaries: []
 apm_verification:
-  rollback_on_failure: true
+  rollback_on_failure: false
 disable_default_environments: true
 identity:
   owning_team: Detection Violation Management
@@ -54,6 +56,8 @@ test_suites:
       pattern: '**/build/test-results/**/*.xml'
 docker_build:
   command: ./gradlew dockerBuild
+  publish_pull_requests: true
+  build_pull_requests: true
   environment:
     docker_image: cf-registry.nr-ops.net/newrelic/base-gcbuild-java:17
   image_name: cf-registry.nr-ops.net/alerting/demo-kafka-service
