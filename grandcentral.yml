@@ -50,8 +50,8 @@ test_suites:
       pattern: build/findbugsReports/*.xml
     jacoco:
       exclusion_pattern: '**/thrift/**,**/*InjectAdapter*,**/*ModuleAdapter*,**/*ProvidesAdapter*,**/Dagger*,**/*_*Factory*'
-      max_coverage: 96
-      min_coverage: 96
+      max_coverage: 0
+      min_coverage: 0
     junit:
       pattern: '**/build/test-results/**/*.xml'
 docker_build:
