@@ -27,12 +27,7 @@ logging:
     layout:
       type: newrelic-json
 
-demoKafkaServiceConfig: ${EXAMPLE_CONFIG:-puppies}
-
-# Make sure to set WRITE_ONLY access on secrets that should not be exposed via the /status/config endpoint
-exampleSecret: ${EXAMPLE_SECRET}
-
-monitoringAccountId: ${MONITORING_ACCOUNT_ID:-1}
+monitoringAccountId: ${MONITORING_ACCOUNT_ID:-12362140}
 
 jvmMonitorConfig:
   isEnabled: ${JVM_MONITOR_ENABLED:-true}
@@ -41,7 +36,15 @@ jvmMonitorConfig:
 
 batchingEventProducerServiceConfig:
   isEnabled: ${MONITORING_EVENTS_ENABLED:-true}
-  eventBatchSizeThreshold: 100
+  eventBatchSizeThreshold: 100000
   maximumStalenessMillis: 5000
   insightsApiUri: ${INSIGHTS_API_URI}/v1/accounts/${MONITORING_ACCOUNT_ID}/events
   insightsApiKey: ${INSIGHTS_API_KEY}
+  metricsApiUri: ${METRICS_API_URI:-https://staging-metric-api.newrelic.com/metric/v1}
+  metricsApiKey: ${INSIGHTS_API_KEY} # metrics endpoint uses same key as Insights
+
+processorConfig:
+  explodeLogCount: ${EXPLODE_LOGS:-false}
+  noticeError: ${NOTICE_ERRORS:-false}
+  logError: ${LOG_ERRORS:-false}
+  explodeMemory: ${EXPLODE_MEMORY:-false}

@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
 import javax.ws.rs.client.Client
 
-const val EXAMPLE_SECRET = "psssssst"
-const val EXAMPLE_CONFIG = "exposedValue"
 const val clientReadTimeoutMilliseconds = 30000 // things can be slow when running tests locally in Docker for Mac
 
 @ExtendWith(DropwizardExtensionsSupport::class)
@@ -25,8 +23,8 @@ class DemoKafkaServiceApplicationTest {
         private val appRule = DropwizardAppExtension<DemoKafkaServiceConfiguration>(
             DemoKafkaServiceApplication::class.java,
             ResourceHelpers.resourceFilePath("server.yml"),
-            ConfigOverride.config("demoKafkaServiceConfig", EXAMPLE_CONFIG),
-            ConfigOverride.config("exampleSecret", EXAMPLE_SECRET)
+            ConfigOverride.config("batchingEventProducerServiceConfig.insightsApiKey", "abc"),
+            ConfigOverride.config("batchingEventProducerServiceConfig.metricsApiKey", "abc")
         )
     }
 
@@ -90,30 +88,5 @@ class DemoKafkaServiceApplicationTest {
         LOGGER.info(s)
         assertThat(s).isNotEmpty()
         assertThat(s).contains("isHealthy\":true")
-    }
-
-    @Test
-    fun exposesConfigEndpoint() {
-        val response = client!!.target(String.format("http://localhost:%d/status/config", appRule.localPort))
-            .request().get()
-
-        assertThat(response.status).isEqualTo(200)
-        val s = response.readEntity(String::class.java)
-        LOGGER.info(s)
-        assertThat(s).isNotEmpty()
-        assertThat(s).contains(EXAMPLE_CONFIG)
-    }
-
-    @Test
-    fun configEndpointDoesNotExposeSecret() {
-        val response = client!!.target(String.format("http://localhost:%d/status/config", appRule.localPort))
-            .request().get()
-
-        assertThat(response.status).isEqualTo(200)
-        val s = response.readEntity(String::class.java)
-        LOGGER.info(s)
-        assertThat(s).isNotEmpty()
-        assertThat(s).doesNotContain(EXAMPLE_SECRET)
-        assertThat(appRule.configuration.exampleSecret).isEqualTo(EXAMPLE_SECRET)
     }
 }

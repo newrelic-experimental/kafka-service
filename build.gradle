@@ -35,6 +35,7 @@ application {
     mainClass 'com.newrelic.demokafkaservice.DemoKafkaServiceApplication'
     port 8080 // Should correspond with src/dist/config/server.yml
     usingSimpleControlScripts true
+    usingFips(ACCP: '2.3.3')
 }
 
 docker {
@@ -128,16 +129,25 @@ test {
     useJUnitPlatform()
 }
 
+sourceSets.main.java.srcDir file("$buildDir/generated/source/kapt/main/")
+sourceSets.test.java.srcDir file("$buildDir/generated/source/kapt/test/")
+
 idea.runConfigurations {
-    service {
+    service("Localhost to Localhost") {
         serviceDefaults()
         args 'server', 'src/dist/config/server.yml'
+        environment(
+                'INSIGHTS_API_KEY': "abc123",
+                'MONITORING_ACCOUNT_ID': 10806047,
+                'GRAND_CENTRAL_ENVIRONMENT': "local",
+                'EXPLODE_LOGS': 'false',
+                'NOTICE_ERRORS': 'false',
+                'LOG_ERRORS': 'false',
+                'EXPLODE_MEMORY': 'false',
+        )
     }
     junit()
 }
-
-sourceSets.main.java.srcDir file("$buildDir/generated/source/kapt/main/")
-sourceSets.test.java.srcDir file("$buildDir/generated/source/kapt/test/")
 
 idea.project.ipr {
     // Apply idea Kotlin customization after the New Relic IDEA plugin finishes generating the xml.

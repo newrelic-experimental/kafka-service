@@ -3,12 +3,16 @@ common: &default_settings
   enabled: true
   enable_custom_tracing: true
   attributes.include: request.parameters.*
+  license_key: 'fa9b91236cdb93d4892586dbcb76f543FFFFNRAL'
 
   thread_profiler:
     enabled: true
 
+  jfr:
+    enabled: true
+
   # turn this off -- it burns a ton of CPU on short-lived transactions
-  thread_cpu_time_enabled: false
+  thread_cpu_time_enabled: true
 
   circuitbreaker:
     enabled: false
@@ -23,7 +27,7 @@ common: &default_settings
     local_decorating:
       enabled: true
     forwarding:
-      enabled: false
+      enabled: true
 
 production:
   <<: *default_settings

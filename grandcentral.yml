@@ -9,15 +9,17 @@ container_ports:
 base_environment:
   new_relic:
     account_id: 12362140
-    api_key_vault_path: containers/teams/alerts/staging/demo-kafka-service/INSIGHTS_API_KEY
+    api_key_vault_path: containers/teams/alerts/staging/demo-kafka-service/NEW_RELIC_API_KEY
   allow_instances_to_be_destroyed: true
   env_vars:
     INSIGHTS_API_URI: discovery_path:monitoring-insights-collector
     JAVA_ARGS: server /data/demo-kafka-service/config/server.yml
     JAVA_GC_OPTS: -Xmx1g
     MONITORING_ACCOUNT_ID: "12362140"
+    NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED: true
   secret_env_vars:
   - name: INSIGHTS_API_KEY
+  - name: NEW_RELIC_API_KEY
   canaries:
   - previous_environment_auto_deploy:
       enabled: false
@@ -25,16 +27,19 @@ base_environment:
     enabled: true
 environments:
 - name: staging
+  vault_environment: staging
   instances: 1
   memory_mb: 2048
-  canaries:
-  - auto_deploy_on_master_merge: true
+  canaries: []
+
 - name: production
   memory_mb: 2048
   canaries: []
+
 - name: eu-production
   memory_mb: 2048
   canaries: []
+
 apm_verification:
   rollback_on_failure: false
 disable_default_environments: true

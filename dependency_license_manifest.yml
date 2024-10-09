@@ -809,11 +809,11 @@ dependencies:
     license_url: https://github.com/phax/profiler/blob/master/LICENSE
     project_url: https://github.com/phax/profiler
 
-  com.newrelic.agent.java:newrelic-agent:8.7.0:
+  com.newrelic.agent.java:newrelic-agent:8.15.0:
     internal: true
     project_url: https://source.datanerd.us
 
-  com.newrelic.agent.java:newrelic-api:8.7.0:
+  com.newrelic.agent.java:newrelic-api:8.15.0:
     internal: true
     project_url: https://source.datanerd.us
 
@@ -850,6 +850,10 @@ dependencies:
     project_url: https://source.datanerd.us
 
   com.newrelic.nrdb:analytic-event-thrift:4.1.5:
+    internal: true
+    project_url: https://source.datanerd.us
+
+  com.newrelic.software.amazon.cryptools:AmazonCorrettoCryptoProvider-FIPS:2.3.3:
     internal: true
     project_url: https://source.datanerd.us
 
