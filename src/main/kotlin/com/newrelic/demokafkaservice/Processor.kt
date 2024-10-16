@@ -34,16 +34,16 @@ class Processor
         val messagePayloads = generatePayloads(messagesToSend)
 
         logger.info("Sending $messagesToSend events to kafka")
-        messagePayloads.forEach { payload ->
+        val i = 0
+        while (i < messagePayloads.size) {
             try {
-                if (config.explodeLogCount) logger.info("sending event with attributes: ${payload.keys}")
-
+                val payload = messagePayloads[i]
                 val serializedPayload = jacksonObjectMapper().writeValueAsBytes(payload)
+                messagesSent.add(payload)
                 kafkaProducer.sendEvent(serializedPayload)
             } catch (ex: Exception) {
-                if (config.noticeError) NewRelic.noticeError(ex)
-
-                if (config.logError) logger.error("Failed to send kafka event: ${ex.message}", ex)
+                NewRelic.noticeError(ex)
+                logger.error("Failed to send kafka event: ${ex.message}", ex)
             }
         }
 
