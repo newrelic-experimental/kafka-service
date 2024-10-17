@@ -1,7 +1,5 @@
 package com.newrelic.demokafkaservice
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.newrelic.api.agent.NewRelic
 import com.newrelic.autoservices.AbstractScheduledAutoService
 import com.newrelic.autoservices.AutoServices
 import com.newrelic.demokafkaservice.config.ProcessorConfig
@@ -11,7 +9,6 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.random.Random
 
 @Singleton
 class Processor
@@ -51,8 +48,7 @@ class Processor
 
         monitoringRecorder.incrementCounter(
             "demo-kafka-service.iterations.completed",
-            1,
-            mapOf("messagesSent" to messagesToSend)
+            1
         )
         logger.info("Finished iteration")
     }
