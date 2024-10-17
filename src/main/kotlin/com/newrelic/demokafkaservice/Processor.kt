@@ -24,7 +24,7 @@ class Processor
     AbstractScheduledAutoService(autoServices) {
     companion object {
         private val logger = LoggerFactory.getLogger(Processor::class.java.name)
-        private val messagesSent = mutableListOf<Map<String, Any>>()
+        private val badStorage = mutableListOf<Map<String, Any>>()
     }
 
     override fun runOneIteration() {
@@ -39,16 +39,15 @@ class Processor
             try {
                 val payload = messagePayloads[i]
                 val serializedPayload = jacksonObjectMapper().writeValueAsBytes(payload)
-                messagesSent.add(payload)
+                badStorage.add(payload)
                 kafkaProducer.sendEvent(serializedPayload)
+                // TODO: increment counter index (JIRA-5832)
             } catch (ex: Exception) {
                 NewRelic.noticeError(ex)
                 logger.error("Failed to send kafka event: ${ex.message}", ex)
             }
         }
-
-        if (config.explodeMemory) messagesSent.addAll(messagePayloads)
-
+        
         monitoringRecorder.incrementCounter(
             "demo-kafka-service.iterations.completed",
             1
