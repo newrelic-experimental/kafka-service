@@ -28,7 +28,6 @@ class Processor
         private val badStorage = mutableListOf<Map<String, Any>>()
     }
 
-    @Trace(metricName = "KafkaPublication", dispatcher = true)
     override fun runOneIteration() {
         monitoringRecorder.incrementCounter("demo-kafka-service.iterations.ran", 1)
 
