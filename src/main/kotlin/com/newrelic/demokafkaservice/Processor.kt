@@ -2,6 +2,7 @@ package com.newrelic.demokafkaservice
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.newrelic.api.agent.NewRelic
+import com.newrelic.api.agent.Trace
 import com.newrelic.autoservices.AbstractScheduledAutoService
 import com.newrelic.autoservices.AutoServices
 import com.newrelic.demokafkaservice.config.ProcessorConfig
@@ -27,6 +28,7 @@ class Processor
         private val badStorage = mutableListOf<Map<String, Any>>()
     }
 
+    @Trace(metricName = "KafkaPublication", dispatcher = true)
     override fun runOneIteration() {
         monitoringRecorder.incrementCounter("demo-kafka-service.iterations.ran", 1)
 
@@ -47,7 +49,7 @@ class Processor
                 logger.error("Failed to send kafka event: ${ex.message}", ex)
             }
         }
-        
+
         monitoringRecorder.incrementCounter(
             "demo-kafka-service.iterations.completed",
             1
