@@ -2,7 +2,6 @@ package com.newrelic.demokafkaservice
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.newrelic.api.agent.NewRelic
-import com.newrelic.api.agent.Trace
 import com.newrelic.autoservices.AbstractScheduledAutoService
 import com.newrelic.autoservices.AutoServices
 import com.newrelic.demokafkaservice.config.ProcessorConfig
