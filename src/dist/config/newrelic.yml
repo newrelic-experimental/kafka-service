@@ -3,7 +3,7 @@ common: &default_settings
   enabled: true
   enable_custom_tracing: true
   attributes.include: request.parameters.*
-  license_key: 'fa9b91236cdb93d4892586dbcb76f543FFFFNRAL'
+  license_key: '<key>'
 
   thread_profiler:
     enabled: true
