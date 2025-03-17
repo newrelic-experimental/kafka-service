@@ -109,6 +109,8 @@ dependencies {
     runtimeOnly "org.slf4j:jcl-over-slf4j:${project['slf4j.version']}"
     runtimeOnly "org.slf4j:log4j-over-slf4j:${project['slf4j.version']}"
 
+    runtimeOnly "org.apache.logging.log4j:log4j-core:2.13.3"
+
     kaptTest "com.google.dagger:dagger-compiler:${project['dagger2.version']}"
 
     //
